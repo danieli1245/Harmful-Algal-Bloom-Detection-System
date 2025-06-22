@@ -22,11 +22,11 @@ with tabs[0]:
          submit = st.form_submit_button("Submit")
 
          payload = {
-        "region": region,
-        "longitude": lon,
-        "latitude": lat,
-        "distance_to_water_m": distance_to_water
-         }
+             "region": region,
+             "longitude": lon,
+             "latitude": lat,
+             "distance_to_water_m": distance_to_water
+             }
     if submit:
         if not region and not lat and not lon:
               st.error("Please fill in all the required fields.")
