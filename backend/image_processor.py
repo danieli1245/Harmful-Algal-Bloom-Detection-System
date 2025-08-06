@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageDraw
+import base64
 
 # Current model expects 64x64 (HxW)
 MODEL_IMG_SIZE = (64, 64)
@@ -91,3 +92,25 @@ def convert_datacube_to_images(numerical_datacube, config, tier):
     
     print(f"Image conversion and resizing complete. Final shape: {final_sequence_array.shape}")
     return final_sequence_array
+
+def draw_detections_on_image_and_save(input_img: Image.Image, detections: list):
+    # Make a copy for drawing
+    print('Creating BOUNDING BOX ::::::::::::::')
+    image = input_img.copy()
+    draw = ImageDraw.Draw(image)
+
+    for det in detections:
+        x1, y1, x2, y2 = det["bbox"]
+        draw.rectangle([x1, y1, x2, y2], outline='blue', width=4)
+        
+    print('BOUNDING BOX CREATED ::::::::::::::')
+
+    # Ensure the save directory exists
+    if image.mode in ('RGBA', 'P'):
+        image = image.convert('RGB')
+
+    # Convert to base64 for frontend output
+    buffer = io.BytesIO()
+    image.save(buffer, format="JPEG")
+    base64_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    return base64_img
