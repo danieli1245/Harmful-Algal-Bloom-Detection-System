@@ -7,8 +7,7 @@ import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from datacube_generator import generate_prediction_datacube
-from image_processor import convert_datacube_to_images
-from joblib import load
+from image_processor import convert_datacube_to_images, draw_detections_on_image_and_save
 from dependencies import get_api_key
 from enum import Enum
 from config import TIER_CONFIG
@@ -19,7 +18,7 @@ from tensorflow.keras.layers import Flatten, Dense, Layer, Multiply, Permute, Re
 import time 
 from ultralytics import YOLO
 import io
-from PIL import Image, ImageDraw
+from PIL import Image
 from fastapi.responses import JSONResponse
 
 # Initialize FastAPI
@@ -193,30 +192,6 @@ async def predictimage(file: UploadFile = File(...), api_key: str = Depends(get_
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction Error: {str(e)}")
-
-
-import base64
-def draw_detections_on_image_and_save(input_img: Image.Image, detections: list):
-    # Make a copy for drawing
-    print('Creating BOUNDING BOX ::::::::::::::')
-    image = input_img.copy()
-    draw = ImageDraw.Draw(image)
-
-    for det in detections:
-        x1, y1, x2, y2 = det["bbox"]
-        draw.rectangle([x1, y1, x2, y2], outline='blue', width=4)
-        
-    print('BOUNDING BOX CREATED ::::::::::::::')
-
-    # Ensure the save directory exists
-    if image.mode in ('RGBA', 'P'):
-        image = image.convert('RGB')
-
-    # Convert to base64 for frontend output
-    buffer = io.BytesIO()
-    image.save(buffer, format="JPEG")
-    base64_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
-    return base64_img
 	
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 8080))
