@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
+from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import numpy as np
 import earthaccess
@@ -114,14 +115,14 @@ async def predict(request: PredictionRequest, api_key: str = Depends(get_api_key
 		start_date_str = request.date
 
 		# Generate the datacube with the specific config
-		datacube = generate_prediction_datacube(lat, lon, start_date_str, config)
+		datacube = await run_in_threadpool(generate_prediction_datacube, lat, lon, start_date_str, config)
 
 		if datacube is None:
 			raise HTTPException(status_code=400, detail="Failed to generate datacube")
 		
 		# Convert to resized, normalized, concatenated image sequence
 		# The output shape is now (10, 64, 64, 9)
-		image_sequence = convert_datacube_to_images(datacube, config, tier)
+		image_sequence = await run_in_threadpool(convert_datacube_to_images, datacube, config, tier)
 
 		'''
 		# Prepare sequence for model
@@ -198,7 +199,10 @@ async def predictimage(file: UploadFile = File(...), api_key: str = Depends(get_
         print('YOLO DETECTION COMPLETED :::::::::::::::::')
         processed_img_b64 = draw_detections_on_image_and_save(image, detections)
         print('BOUNDING BOX CREATION COMPLETED :::::::::::::::::')
-        return JSONResponse(content={"output_image_url": processed_img_b64})
+        if not detections:
+            print('NOTHING DETECTED :::::::::::::::::')
+            return JSONResponse(content={"output_image_url": processed_img_b64,"label": "No Algae Detected"})
+        return JSONResponse(content={"output_image_url": processed_img_b64, "label":"Algae Detected"})
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction Error: {str(e)}")
