@@ -190,51 +190,117 @@ Bump
 
 
 \section{State of the Art and Related Work}
-Harmful Algal Bloom detection has evolved from manual sampling methods to newer machine learning approaches, leading up to HABNet (Hill et al., 2020) \cite{b1}, which is the current state-of-the-art in HAB predictions. Although its success as a research project HABNet is confined to academic environments due to it's complicated implementation and lack of any user-friendly accessibility.
+Harmful Algal Bloom detection has evolved from manual sampling methods to newer machine learning approaches, leading up to HABNet (Hill et al., 2020) \cite{b1}, which is the current state-of-the-art in HAB predictions. Although its success as a research project HABNet is confined to academic environments due to its complicated implementation and lack of any user friendly accessibility.
 
 \subsection{HABNet: Technical Foundation and Critical Limitations}
-HABNet uses a spatio-temporal deep learning architecture in the form of datacubes, using multiple MODIS modalities (chlorophyll-a, SST, PAR, RRS bands) across 100km×10-day windows \cite{b1}. Their hybrid CNN-LSTM system uses NASNet-Mobile for spatial feature extraction followed by LSTM temporal modelling which leads them to achieving a 91\% detection accuracy and 86\% prediction accuracy up to 8 days ahead.
+HABNet uses a spatiotemporal deep learning architecture in the form of datacubes, using multiple MODIS modalities (chlorophyll-a, SST, PAR, RRS bands) across 100km×10-day windows \cite{b1}. Their hybrid CNN-LSTM system uses NASNet-Mobile for spatial feature extraction followed by LSTM temporal modelling which leads them to achieving a 91\% detection accuracy and 86\% prediction accuracy up to 8 days ahead.
 
-HABNet outperforms all alternative approaches. Traditional manual sampling achieves $>95\%$ accuracy but requires multiple days of processing making rapid responses impossible and limiting the usefulness of the information. Remote sensing threshold methods (chlorophyll-a $\geq 20\,\mu\text{g/L}$, spectral shape algorithms) provide realtime coverage but have a 30-40\% false positive rates. Classic Machine Learning approaches using SVMs achieving 0.56 kappa accuracy\cite{b2}, Random Forest methods reaching 0.71 kappa accuracy \cite{b2}, and ensemble approaches achieving 0.86 kappa accuracy \cite{b3}, but all lack temporal modelling and need manual feature engineering on small datasets.
+HABNet outperforms all alternative approaches. Traditional manual sampling achieves a good accuracy but are extremely labor intensive and are limited spatially and temporally \cite{b4} and requires multiple days of lab processing making rapid responses impossible and limiting the usefulness of the information. Remote sensing threshold methods (chlorophyll-a $\geq 20\,\mu\text{g/L}$, spectral shape algorithms) provide realtime coverage but have a 30-40\% false positive rates. Classic Machine Learning approaches using SVMs achieving 0.56 kappa accuracy\cite{b2}, Random Forest methods reaching 0.71 kappa accuracy \cite{b2}, and ensemble approaches achieving 0.86 kappa accuracy \cite{b3}, but all lack temporal modelling and need manual feature engineering on small datasets.
 
+That being said, HABNet is a research paper and not a fully developed system which makes it inaccessible for operational use. The system exists as research code without any user interface, requiring technical expertise in machine learning and satellite data processing.
 
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
+\newline
+Bump
 
 \section{Implementation}
 
-\subsection{System Architecture Overview}
+\textbf{IMPLEMENTATION SECTION GUIDELINES:}
+
+This should explain \textbf{HOW our system works architecturally} and \textbf{WHY we made specific technical choices} - not a tutorial on setup steps.
+
+\textbf{What They Want from us:}
+
+\textbf{"How it was orchestrated to facilitate your solution"} means:
+\begin{itemize}
+    \item How do our components work together?
+    \item Why did we choose specific technologies?
+    \item How does data flow through our system?
+    \item What makes our architecture effective for HAB detection?
+\end{itemize}
+
+\textbf{Key Points:}
+\begin{enumerate}
+    \item \textbf{Focus on "WHY" not "HOW TO"} - explain our architectural decisions
+    \item \textbf{Justify technology choices} - why Google cloud run vs Azure? Why React vs Vue?
+    \item \textbf{Show system thinking} - how components work together
+    \item \textbf{Connect to user needs} - how architecture enables our user scenarios
+\end{enumerate}
+
+\textbf{Don't write:} "We installed Docker and configured Kubernetes..."
+
+\textbf{Instead write:} "Docker containerisation enables consistent model deployment across environments, while Kubernetes orchestration provides automatic scaling during peak prediction loads..."
+
+\textbf{Grading Criteria (30\% of total grade):}
+\begin{itemize}
+    \item Clear description of overall system architecture with all key components discussed
+    \item Excellent descriptions of all key front-end and back-end development with justification
+    \item Clear identification of key data sources with detailed description of how they were/are accessed, collected, stored, and used
+    \item Clear presentation of key technical contributions to the project
+\end{itemize}
+
+\textbf{ Sample Structure:}
+\begin{itemize}
+    \item 4.1 Overall System Architecture
+    \item 4.2 Backend Infrastructure and Justification
+    \item 4.3 Machine Learning Pipeline Orchestration
+    \item 4.4 Frontend Architecture and User Experience
+    \item 4.5 Data Flow and Integration
+    \item 4.6 Key Technical Innovations
+\end{itemize}
+
+
+
 
 
 \section{Evaluation and Results}
-
-\subsection{Dataset Description}
-
-\subsection{Experimental Setup}
-
-
-\subsection{Detection Performance}
-
-
-
-\subsection{Prediction Performance}
-
-
-\subsection{System Performance Evaluation}
-
-
-
-\subsection{User Evaluation}
-
-
-
-\subsection{Technical Evaluation}
 
 
 \section{Conclusions and Future Work}
 
 \begin{thebibliography}{00}
-\bibitem{b1} Paul R Hill et al. “HABNet: Machine learning, remote sensing-based detection of harmful algal blooms”.In: IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 13 (2020),pp. 3229–3239.
+\bibitem{b1} Paul R Hill et al. “HABNet: Machine learning, remote sensing-based detection of harmful algal blooms”.
+In: IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 13 (2020),
+pp. 3229–3239.
 \bibitem{b2} Weilong Song et al. "Learning-Based Algal Bloom Event Recognition for Oceanographic Decision Support System Using Remote Sensing Data". In: Remote Sensing 7.10 (2015), pp. 13564-13585.
 \bibitem{b3} B. Gokaraju et al. "Ensemble methodology for improved detection of harmful algal blooms". In: IEEE Geoscience and Remote Sensing Letters 9.5 (2012), pp. 827-831.
+\bibitem{b4} Susanne E. Craig et al. "Use of hyperspectral remote sensing reflectance for detection and assessment of the harmful alga, Karenia brevis". In: Applied Optics 45 (2006), pp. 5414-5425.
 \end{thebibliography}
 
 \end{document}
