@@ -1,7 +1,5 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
-%Template version as of 6/27/2024
 
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -55,6 +53,7 @@ email address @ucdconnect.ie}
 }
 
 \maketitle
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \begin{abstract}
 Harmful Algal Blooms (HABs) pose serious risks to marine ecosystems, human health, and coastal economies. Yet most traditional detection methods remain slow, expensive, and limited in how much area they can cover. In this project, we developed a smarter, faster alternative: an AI-powered HAB Detection System that uses satellite imagery and deep learning to predict toxic bloom events more effectively.
@@ -65,6 +64,7 @@ Users interact with the system through a simple web interface where they can cli
 
 By combining geospatial interactivity, deep learning, and flexible design, this system offers a practical step forward in early HAB detection especially for resource-limited agencies that need timely, reliable insights.
 \end{abstract}
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Introduction}
 Harmful Algal Blooms (HABs) are showing up more frequently and with greater intensity across coastal waters around the world. These toxic blooms, often caused by nutrient runoff and warming ocean temperatures, can do serious damage to marine life, public health, and local economies. In many cases, they've led to large-scale fish deaths, contaminated drinking water, and forced the shutdown of both recreational beaches and fishing operations. Despite the growing threat, most current methods of detecting HABs still rely on manual sampling and lab analysis which are slow, expensive, and not practical for covering large areas in real time.
@@ -75,39 +75,8 @@ The main challenge we faced was figuring out how to model the way key environmen
 
 To make the system flexible and widely usable, we also introduced a tiered prediction structure. Users can choose between a lightweight free version which uses minimal data and more advanced tiers that deliver better accuracy using richer inputs. All of this is wrapped into a simple web interface where users can click on a map and get bloom predictions instantly. The result is a system that combines technical depth with real-world accessibility to stay ahead of harmful algal bloom events.
 
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
+\newpage
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \section{User Stories and Scenarios}
 
@@ -148,46 +117,8 @@ This provides previously inaccessible satellite data analysis into an intuitive 
 This scenario demonstrates our contribution of providing easy access and understanding to quite complex spatiotemporal modelling. The system converts raw multi-modal satellite data into clear forecasts solving the main challenge of making environmental risk assessment usable to non-technical users.
 
 
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-
+\newpage
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \section{State of the Art and Related Work}
 Harmful Algal Bloom detection has evolved from manual sampling methods to newer machine learning approaches, leading up to HABNet (Hill et al., 2020) \cite{b1}, which is the current state-of-the-art in HAB predictions. Although its success as a research project HABNet is confined to academic environments due to its complicated implementation and lack of any user friendly accessibility.
@@ -199,45 +130,9 @@ HABNet outperforms all alternative approaches. Traditional manual sampling achie
 
 That being said, HABNet is a research paper and not a fully developed system which makes it inaccessible for operational use. The system exists as research code without any user interface, requiring technical expertise in machine learning and satellite data processing.
 
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
-\newline
-Bump
+\newpage
+
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Implementation}
 
@@ -286,13 +181,41 @@ This should explain \textbf{HOW our system works architecturally} and \textbf{WH
 \end{itemize}
 
 
-
-
-
+\newpage
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Evaluation and Results}
 
+\subsection{Model Performance Evaluation}
+Our three-tier architecture allows for some direct comparison of accuracy-efficiency trade-offs for different user requirements.
 
+\subsubsection{Free Tier (XGBoost on Coordinates)} Achieved 94.2\% accuracy on coordinate-based predictions with 5-day horizon using single modality (chlorophyll-a). However, detailed analysis revealed precision of 0.69, recall of 0.69, and F1-score of 0.69, indicating class imbalance challenges and spatial data leakage in early experiments. Prediction latency averages 2-3 minutes per request, suitable for non-critical applications.
+
+\subsubsection{Tier 1 (CNN Architecture)} Demonstrated 73\% accuracy with precision 0.74, recall 0.73, and F1-score 0.73 on held-out test data. The CNN effectively learns spatial patterns from daily satellite imagery, processing three modalities (chlorophyll-a, SST, PAR) with 1-2 minute latency. 
+
+\subsubsection{Tier 2 (CNN+BiLSTM)} Achieved our target 92\% accuracy with precision 0.81, recall 0.81, and F1-score 0.81. The attention mechanism successfully identifies critical temporal patterns across 10-day sequences, improving long-range signal detection. 
+
+\subsection{User Experience Evaluation}
+We conducted our user evaluation through a survey sent to some researchers, and while our sample size was limited due to project timeline constraints, the feedback provided valuable insights into our systems user experience.
+
+\subsubsection{Interface Usability}
+Users were overall happy with our websites navigation and UI with an average score of 4.5/5 and our Click-to-predict functionality met user expectations for ease of use without requiring technical expertise
+
+\subsubsection{Tiered Service Model Reception}
+The subscription-based tier system was well-received, with users appreciating the concept of scaling features with needs. However, feedback highlighted the need for clearer pricing information and more transparent explanations of tier differences. Users specifically requested methodology explanations, data modality descriptions, and prediction confidence intervals.
+
+\subsubsection{Improvements}
+The user feedback revealed a few opportunities for improvement: (1) the need for historical trend visualisation alongside the predictions, (2) desire for more visible information on the models and modalities used per tier and the prediction confidences shown (3) Clearer pricing information based on tiers
+
+\subsection{System Performance and Scalability Evaluation}
+
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Conclusions and Future Work}
+
+
+
+
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 \begin{thebibliography}{00}
 \bibitem{b1} Paul R Hill et al. “HABNet: Machine learning, remote sensing-based detection of harmful algal blooms”.
