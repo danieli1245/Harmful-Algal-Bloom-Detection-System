@@ -54,8 +54,9 @@ email address @ucdconnect.ie}
 
 \maketitle
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 \begin{abstract}
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Harmful Algal Blooms (HABs) pose serious risks to marine ecosystems, human health, and coastal economies. Yet most traditional detection methods remain slow, expensive, and limited in how much area they can cover. In this project, we developed a smarter, faster alternative: an AI-powered HAB Detection System that uses satellite imagery and deep learning to predict toxic bloom events more effectively.
 
 At the core of our system is a CNN+LSTM model trained on spatiotemporal data-cubes built from satellite-derived environmental data. The model takes in three key modalities chlorophyll-a concentration, sea surface temperature, and remote sensing reflectance captured across a 10-day window. To make the system accessible to a range of users, we designed a tiered architecture: a lightweight Free Tier using a single modality over 5 days, and more advanced tiers combining richer data for higher accuracy.
@@ -64,9 +65,11 @@ Users interact with the system through a simple web interface where they can cli
 
 By combining geospatial interactivity, deep learning, and flexible design, this system offers a practical step forward in early HAB detection especially for resource-limited agencies that need timely, reliable insights.
 \end{abstract}
+
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\section{Introduction}
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-\section{Introduction}
 Harmful Algal Blooms (HABs) are showing up more frequently and with greater intensity across coastal waters around the world. These toxic blooms, often caused by nutrient runoff and warming ocean temperatures, can do serious damage to marine life, public health, and local economies. In many cases, they've led to large-scale fish deaths, contaminated drinking water, and forced the shutdown of both recreational beaches and fishing operations. Despite the growing threat, most current methods of detecting HABs still rely on manual sampling and lab analysis which are slow, expensive, and not practical for covering large areas in real time.
 
 Our project set out to build a smarter, more scalable approach using satellite data and deep learning. The aim was to design a system that can predict toxic bloom events from space quickly, accurately, and in a way that's easy for people to use. It fits into a larger effort to apply AI to real-world environmental problems, where timely action can help prevent serious harm.
@@ -77,34 +80,33 @@ To make the system flexible and widely usable, we also introduced a tiered predi
 
 \newpage
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 \section{User Stories and Scenarios}
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 The following scenarios demonstrate how different types of users would interact with our HAB Detection System and shows how our platform fills gaps in current HAB monitoring solutions. Each scenario tries to connect a specific users needs to our technical solution and tiered services, showing quantified improvements over current monitoring approaches.
 
 \subsection{Marine Biologists and Environmental Agencies}
 \subsubsection{Current Challenge}
-Environmental researchers and public health officials require urgent access to comprehensive HAB data for scientific analysis and/or emergency response planning. Traditional monitoring means collecting water samples and waiting 3-5 days for laboratory results which is too slow for effective intervention planning. Additionally coverage is limited to static monitoring stations which are quite sparse leaving most of the water unmonitored.
+Environmental researchers and public health officials require urgent access to comprehensive HAB data for scientific analysis and/or emergency response planning. Traditional monitoring requires collecting water samples and waiting 3-5 days for laboratory results which is too slow for effective response planning. Additionally coverage is limited to static monitoring stations which are sparse leaving most of the water unmonitored.
 
 \subsubsection{System Interaction}
-Research institutions and environmental agencies use our Tier 2 services for comprehensive analysis capabilities. Scientists specify coordinates or upload satellite imagery through the dashboard interface, accessing complete 10-day temporal windows across all available modalities (chlorophyll-a, SST, PAR, five RRS bands). The system processes 100km² spatial areas through our CNN-LSTM architecture, providing 94\% accurate predictions with sub 30 second response times.
+Research institutions and environmental agencies use our Tier 2 services for comprehensive analysis of their waters. Scientists specify coordinates or upload satellite imagery through the dashboard interface, accessing complete 10-day temporal windows across all available modalities (chlorophyll-a, SST, PAR, five RRS bands). The system processes 100km² spatial areas through our CNN-LSTM architecture, providing 94\% accurate predictions with sub 30 second response times.
 \subsubsection{Quantified Improvements}
-This improves HAB monitoring from the traditional days-long workflows into minutes of analysis. Researchers gain access to continuous spatial coverage versus the spare monitoring station coverage from typical monitoring networks.
+This improves response time from 5-7 days to under 30 seconds for initial predictions, showing a 99\% reduction in response latency. Researchers gain access to continuous spatial coverage versus the sparse monitoring station coverage from typical monitoring networks.
 
 \subsubsection{Technical Innovation}
-This scenario shows our system's ability to convert our spatiotemporal model outputs into fast and accessible, scientifically rigorous data while providing research-grade accuracy standards. The tiered architecture makes sure computational resources scale appropriately as required.
-
+This scenario demonstrates our system's ability to convert spatiotemporal model outputs into accessible data while providing research-grade accuracy standards. This directly addresses the core challenge identified in our problem statement: traditional monitoring's 3-5 day delay makes effective intervention impossible, while our 8-day predictions provide the critical early warning window. Our CNN+LSTM architecture captures the temporal complexity needed for scientific analysis.
 
 \subsection{Commercial Fishing Operations}
 \subsubsection{Current Challenge}
-Commercial fishermen face huge economic risks from HAB events that can contaminate catches causing costly delays or even damage to equipment. Traditional monitoring provides information far too late to be useful in decision making and doesn't even provide enough spatial and temporal coverage to be useful for plan trips. 
+Commercial fishermen face huge economic risks from HAB events that can contaminate catches causing costly delays or even damage to equipment. Traditional monitoring provides information far too late to be useful in decision making and doesn't even provide enough spatial and temporal coverage to be useful for planning fishing routes. 
 
 \subsubsection{System Interaction}
-A commercial fishing operation uses our Tier 1 services for operational planning. Through our dashboard, operators input their fishing coordinates and get 7-day predictions with 80\% accuracy. The system processes multi-modal satellite data (chlorophyll-a, SST, PAR) through our CNN-LSTM architecture, providing day-by-day toxicity assessments for their specified fishing areas.
+A commercial fishing operation uses our Tier 1 services for operational planning. Through our dashboard, operators input their fishing coordinates and get 7-day predictions with 80\% accuracy. The system processes multi-modal satellite data (chlorophyll-a, SST, PAR) through our CNN-LSTM architecture, providing a day-by-day toxicity assessments for their specified fishing areas.
 \subsubsection{Quantified Improvements}
-This new capability changes their reactive HAB responses into active business preplanning. Operators can schedule fishing activities around predicted safe periods, protecting their equipment investments and catch quality. The extended forecast allows for strategic deployment of vessels and crew, removing any economic losses from unexpected HAB events.
+This scenario shows the economic impact we identified in our problem statement, as unexpected HABs can destroy entire harvests and our early warning transforms this from unavoidable loss to preventable risk. This new capability changes their reactive HAB responses into active business preplanning. Operators can schedule fishing routes around predicted safe periods and areas, protecting their equipment investments and catch quality. This forecast allows for strategic deployment of vessels and crew, removing any economic losses from unexpected HAB events.
 \subsubsection{Technical Innovation}
-This use case showcases our ability to deliver operational-grade forecasts with the reliability and temporal resolution required for commercial decision-making, tackling the scalability limitations of traditional monitoring approaches.
+This use case showcases how our tiered architecture balances computational cost with prediction accuracy for commercial operations. Our multi-threading and cloud autoscaling provides reliable, time-sensitive predictions during peak fishing seasons, overcoming the scalability limitations of traditional monitoring.
 
 \subsection{Recreational Water Users}
 \subsubsection{Current Challenge}
@@ -114,76 +116,52 @@ A family planning a weekend lake visit accesses our Free Tier service through th
 \subsubsection{Quantified Improvements}
 This provides previously inaccessible satellite data analysis into an intuitive point-and-click user experience. Users receive actionable safety information without requiring any technical expertise, enabling proactive decision-making about their activities. The colour coded risk visualisation (green/yellow/red) allows for easy comprehension of complex environmental data.
 \subsubsection{Technical Innovation}
-This scenario demonstrates our contribution of providing easy access and understanding to quite complex spatiotemporal modelling. The system converts raw multi-modal satellite data into clear forecasts solving the main challenge of making environmental risk assessment usable to non-technical users.
+This scenario demonstrates our Free Tier's goal of making complex spatiotemporal HAB predictions accessible to non-technical users. Our system addresses the challenge of translating research-grade modelling into simple, actionable public guidance through our easy to use UI and binary risk display.
 
 
-\newpage
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 \section{State of the Art and Related Work}
-Harmful Algal Bloom detection has evolved from manual sampling methods to newer machine learning approaches, leading up to HABNet (Hill et al., 2020) \cite{b1}, which is the current state-of-the-art in HAB predictions. Although its success as a research project HABNet is confined to academic environments due to its complicated implementation and lack of any user friendly accessibility.
-
-\subsection{HABNet: Technical Foundation and Critical Limitations}
-HABNet uses a spatiotemporal deep learning architecture in the form of datacubes, using multiple MODIS modalities (chlorophyll-a, SST, PAR, RRS bands) across 100km×10-day windows \cite{b1}. Their hybrid CNN-LSTM system uses NASNet-Mobile for spatial feature extraction followed by LSTM temporal modelling which leads them to achieving a 91\% detection accuracy and 86\% prediction accuracy up to 8 days ahead.
-
-HABNet outperforms all alternative approaches. Traditional manual sampling achieves a good accuracy but are extremely labor intensive and are limited spatially and temporally \cite{b4} and requires multiple days of lab processing making rapid responses impossible and limiting the usefulness of the information. Remote sensing threshold methods (chlorophyll-a $\geq 20\,\mu\text{g/L}$, spectral shape algorithms) provide realtime coverage but have a 30-40\% false positive rates. Classic Machine Learning approaches using SVMs achieving 0.56 kappa accuracy\cite{b2}, Random Forest methods reaching 0.71 kappa accuracy \cite{b2}, and ensemble approaches achieving 0.86 kappa accuracy \cite{b3}, but all lack temporal modelling and need manual feature engineering on small datasets.
-
-That being said, HABNet is a research paper and not a fully developed system which makes it inaccessible for operational use. The system exists as research code without any user interface, requiring technical expertise in machine learning and satellite data processing.
-
-\newpage
-
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Harmful Algal Bloom detection has evolved from manual sampling methods to newer machine learning approaches, leading up to HABNet (Hill et al., 2020) \cite{b1}, which is the current State of the art in HAB predictions, achieving a 91\% detection and 86\% prediction accuracy. However HABNet is only an academic project and isn't easily accessible due to its complicated implementation and lack of accessible user interfaces, making it unusable for most people needing HAB predictions.
+
+\subsection{Traditional Methods and Limitations}
+Traditional manual sampling achieves a good accuracy but is extremely labor intensive and is limited spatially and temporally \cite{b2} and requires 3-5 days processing in a lab with $<1\%$ spatial coverage. Remote sensing threshold methods using chlorophyll-a anomaly detection  \cite{b3} and spectral shape algorithms \cite{b4} provide real-time coverage but demonstrate poor performance, with HABNet showing that conventional threshold methods achieve only 0.55-0.62 accuracy and a max of 0.15 kappa scores compared to their 91\% detection accuracy \cite{b1}. Classical ML approaches using SVMs (0.56 kappa) \cite{b5}, Random Forest (0.71 kappa) \cite{b5}, and ensemble methods (0.86 kappa) \cite{b6} lack temporal modelling and require manual feature engineering, limiting their effectiveness.
+
+\subsection{HABNet Technical Foundation and Critical Analysis}
+HABNet's spatiotemporal datacube architecture with hybrid CNN-LSTM modelling suggests a paradigm shift in HAB detection. Hill et al. \cite{b1} use NASNet-Mobile for spatial feature extraction and LSTM for temporal modelling across 100km$\times$10-day windows, using multiple MODIS modalities (chlorophyll-a, SST, PAR, RRS bands). Their approach achieved 91\% detection accuracy and 86\% prediction accuracy up to 8 days ahead, a huge improvement over traditional threshold methods. This approach builds on foundational advances in deep learning \cite{b7} and LSTM architectures \cite{b8} that have revolutionised spatiotemporal pattern recognition in computer vision and environmental monitoring.
+
+HABNet's great work exists only as research code without any user interface, providing no operational deployment and requiring ML expertise to set up and use. The system demonstrates a proof-of-concept but is inaccessible to the environmental agencies, commercial fishing operators, and public users who would most benefit from HAB predictions.
+
+\subsection{Methodology Foundation and Operational Adaptations}
+Our technical approach builds directly on the HABNet architecture, using their proven methodology for our deployment. We adopted their core technical decisions, slightly modifying them to fit our tiered service model, to bridge the gap between HABNet's research capabilities and practical accessibility.
+
+HABNet shows that NASNet-Mobile provided optimal results for spatial pattern recognition in their analysis, achieving better performance compared to VGG and Inception alternatives they tested \cite{b1}. We used this proven CNN architecture for our spatial feature extraction and similarly, we kept their LSTM component for temporal modelling, despite their observation that LSTMs provided only small improvements over simpler approaches for the 10-day sequences, to keep it consistent with their methodology.
+
+We also follow HABNet's multi-modal MODIS approach, using the same satellite data sources and modalities that they validated \cite{b1}. Their choice of MODIS-Aqua data from 2003-2018 was due to its comprehensive historical availability which is needed for machine learning training. Newer sensors like Sentinel-3 lack sufficient historical data for model development.
+
+\subsection{Operational Deployment Gap}
+Current operational systems provide limited capabilities. Manual sampling methods remain the gold standard but suffer from inherent spatial and temporal limitations \cite{b2} Current operational systems like NOAA's HAB-OFS \cite{b10} provide only 4-day forecasts limited to Florida waters and do not utilise trained machine learning capabilities \cite{b1}. and offer a much lower accuracy than demonstrated by HABNet. The gap between research capability (HABNet's 8-day predictions at 86\% accuracy) and operational deployments shows the current limitation in current HAB monitoring.
+
+No existing system has accessible interfaces for the user communities who need HAB predictions: environmental researchers require comprehensive data access, commercial operators need reliable forecasts, and the general public needs simple risk communication. This accessibility gap prevents the benefits of advanced HAB prediction from reaching people need them most.
+
+\subsection{Research Contribution and Implementation Innovation}
+Our system addresses the deployment gap by providing an operational implementation of HABNet-class spatiotemporal HAB prediction. Key contributions include: (1) tiered architecture enabling diverse user needs within a single platform, (2) cloud deployment demonstrating scalability and reliability, (3) intuitive web interface making advanced HAB prediction accessible to non-technical users, and (4) comprehensive evaluation including user experience alongside technical performance.
+
+By building on HABNet's proven foundation and overcoming it's deployment limitations, our work allows for the transformation from reactive HAB monitoring to proactive environmental management, making advanced HAB monitoring capabilities accessible to everyone.
+\newpage
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Implementation}
 
-\textbf{IMPLEMENTATION SECTION GUIDELINES:}
-
-This should explain \textbf{HOW our system works architecturally} and \textbf{WHY we made specific technical choices} - not a tutorial on setup steps.
-
-\textbf{What They Want from us:}
-
-\textbf{"How it was orchestrated to facilitate your solution"} means:
-\begin{itemize}
-    \item How do our components work together?
-    \item Why did we choose specific technologies?
-    \item How does data flow through our system?
-    \item What makes our architecture effective for HAB detection?
-\end{itemize}
-
-\textbf{Key Points:}
-\begin{enumerate}
-    \item \textbf{Focus on "WHY" not "HOW TO"} - explain our architectural decisions
-    \item \textbf{Justify technology choices} - why Google cloud run vs Azure? Why React vs Vue?
-    \item \textbf{Show system thinking} - how components work together
-    \item \textbf{Connect to user needs} - how architecture enables our user scenarios
-\end{enumerate}
-
-\textbf{Don't write:} "We installed Docker and configured Kubernetes..."
-
-\textbf{Instead write:} "Docker containerisation enables consistent model deployment across environments, while Kubernetes orchestration provides automatic scaling during peak prediction loads..."
-
-\textbf{Grading Criteria (30\% of total grade):}
-\begin{itemize}
-    \item Clear description of overall system architecture with all key components discussed
-    \item Excellent descriptions of all key front-end and back-end development with justification
-    \item Clear identification of key data sources with detailed description of how they were/are accessed, collected, stored, and used
-    \item Clear presentation of key technical contributions to the project
-\end{itemize}
-
-\textbf{ Sample Structure:}
-\begin{itemize}
-    \item 4.1 Overall System Architecture
-    \item 4.2 Backend Infrastructure and Justification
-    \item 4.3 Machine Learning Pipeline Orchestration
-    \item 4.4 Frontend Architecture and User Experience
-    \item 4.5 Data Flow and Integration
-    \item 4.6 Key Technical Innovations
-\end{itemize}
 
 
 \newpage
+temp
+\newpage
+
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Evaluation and Results}
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Model Performance Evaluation}
 Our three-tier architecture allows for some direct comparison of accuracy-efficiency trade-offs for different user requirements.
@@ -207,23 +185,62 @@ The subscription-based tier system was well-received, with users appreciating th
 The user feedback revealed a few opportunities for improvement: (1) the need for historical trend visualisation alongside the predictions, (2) desire for more visible information on the models and modalities used per tier and the prediction confidences shown (3) Clearer pricing information based on tiers
 
 \subsection{System Performance and Scalability Evaluation}
+To validate the stability and scalability of our architecture, we conducted a series of stress tests using Apache JMeter. The goal was to simulate a realistic, high-traffic scenario to observe the behavior of our backend services under load.
 
+\subsubsection{Test Methodology}
+The test profile was designed to simulate 50 concurrent users making simultaneous prediction requests. To ensure a robust and realistic simulation, each virtual user was authenticated with a unique JSON Web Token (JWT). Furthermore, the requests were randomised with different geographic coordinates and subscription tiers, forcing the system to handle a dynamic and varied workload rather than a simple, repeatable task.
+
+\subsubsection{Client-Side Performance Metrics}
+The results from the client's perspective, as measured by JMeter, were highly successful. The system achieved a \textbf{100\% success rate}, processing all 50 concurrent requests with zero errors. This demonstrates the fundamental stability of the application under significant load.
+
+The \textbf{95th percentile response time was 75.8 seconds}. While it may seem long, it is important to contextualise this metric. The response time is almost entirely dominated by the time required for the Prediction Service to download large volumes of satellite data from the external NASA Earthdata archive, not by a bottleneck in our system's request handling or processing logic. The measured throughput was 0.63 requests per second, a figure that is a direct function of this long job duration.
+
+\subsubsection{Server-Side Analysis and Autoscaling}
+Analysis of the server-side metrics from Google Cloud Run provided clear evidence of our architecture's efficiency and scalability.
+\begin{itemize}
+    \item \textbf{User Service (Gateway):} The CPU utilisation for the User Service remained flat and near-zero throughout the test which is significant as it proves the effectiveness of our asynchronous, non-blocking gateway design. The service was able to handle all 50 incoming requests and delegate them without becoming resource-constrained.
+    \item \textbf{Prediction Service (Worker):} The Prediction Service demonstrated a textbook example of successful horizontal autoscaling. Cloud Run automatically provisioned new container instances to handle the concurrent job requests, as evidenced by the rising container instance count during the test. CPU utilisation charts for these instances showed sharp spikes during processing, confirming that they were being utilised effectively. Critically, memory utilisation increased during processing and then dropped back down after the jobs were complete, indicating efficient memory management and no memory leaks.
+\end{itemize}
+In summary, the stress tests confirmed that our decoupled, serverless architecture is not only stable but also highly scalable and efficient, validating our key design decisions.
+
+\newpage
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Conclusions and Future Work}
-
-
-
-
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+\subsection{Summary of Achievements}
+Our HAB Detection System successfully achieves the transformation from reactive harmful algal bloom management to a proactive approach by using satellite data and machine learning. The system achieves its core objective of providing HAB predictions for 10 days ahead with a 92\% accuracy, achieving a clear improvement over traditional 3 day forecasts with 60\% accuracy. This achievement gives the important 5-7 days needed for an effective response, potentially preventing millions in economic losses and protecting public health.
 
+The tiered architecture successfully, serves diverse users needs from recreational water users to research institutions, balancing efficiency with prediction accuracy based on their needs. Our Free Tier gives accessible predictions for general public use, while premium tiers providing research grade accuracy for professional applications. Our performance testing confirms system scalability with demonstrating production readiness.
+
+\newpage
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{thebibliography}{00}
+%%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 \bibitem{b1} Paul R Hill et al. “HABNet: Machine learning, remote sensing-based detection of harmful algal blooms”.
 In: IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing 13 (2020),
 pp. 3229–3239.
-\bibitem{b2} Weilong Song et al. "Learning-Based Algal Bloom Event Recognition for Oceanographic Decision Support System Using Remote Sensing Data". In: Remote Sensing 7.10 (2015), pp. 13564-13585.
-\bibitem{b3} B. Gokaraju et al. "Ensemble methodology for improved detection of harmful algal blooms". In: IEEE Geoscience and Remote Sensing Letters 9.5 (2012), pp. 827-831.
-\bibitem{b4} Susanne E. Craig et al. "Use of hyperspectral remote sensing reflectance for detection and assessment of the harmful alga, Karenia brevis". In: Applied Optics 45 (2006), pp. 5414-5425.
+\bibitem{b2} Susanne E. Craig et al. "Use of hyperspectral remote sensing reflectance for detection and assessment of the harmful alga, Karenia brevis". In: Applied Optics 45 (2006), pp. 5414-5425.
+\bibitem{b3} R.P. Stumpf, M.E. Culver, P.A. Tester, M. Tomlinson, G.J. Kirkpatrick, B.A. Pederson, E. Truby, V. Ransibrahmanakul and M. Soracco, "Monitoring karenia brevis blooms in the gulf of mexico using satellite ocean color imagery and other data," Harmful Algae, vol. 2, no. 2, pp. 147–160, 2003.
+\bibitem{b4} M.C. Tomlinson, R.P. Stumpf, V. Ransibrahmanakul, E.W. Truby, G.J. Kirkpatrick, B.A. Pederson, G.A. Vargo and C.A. Heil, "Evaluation of the use of seawifs imagery for detecting karenia brevis harmful algal blooms in the eastern gulf of mexico," Remote Sensing of Environment, vol. 91, no. 3-4, pp. 293–303, 2004.
+\bibitem{b5} Weilong Song et al. "Learning-Based Algal Bloom Event Recognition for Oceanographic Decision Support System Using Remote Sensing Data". In: Remote Sensing 7.10 (2015), pp. 13564-13585.
+\bibitem{b6} B. Gokaraju et al. "Ensemble methodology for improved detection of harmful algal blooms". In: IEEE Geoscience and Remote Sensing Letters 9.5 (2012), pp. 827-831.
+\bibitem{b7} Y. LeCun, Y. Bengio, and G. Hinton, "Deep learning," Nature, vol. 521, no. 7553, pp. 436–444, 2015.
+
+\bibitem{b8} S. Hochreiter and J. Schmidhuber, "Long short-term memory," Neural computation, vol. 9, no. 8, pp. 1735–1780, 1997.
+
+
+
+
+
+
+\bibitem{b10} "Harmful Algal BloomS Observing System," https://habsos.noaa.gov/.
+
+
+
+
 \end{thebibliography}
+
 
 \end{document}
