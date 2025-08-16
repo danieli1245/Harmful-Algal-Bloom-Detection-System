@@ -11,6 +11,15 @@
 \usepackage{longtable}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{bookmark}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+
+
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -29,12 +38,12 @@ daniel.ilyin@ucdconnect.ie}
 \IEEEauthorblockN{Sagar Satish Poojary}
 \IEEEauthorblockA{\textit{School of Computer Science, UCD} \\
 Dublin, Ireland \\
-email address @ucdconnect.ie}
+sagar.poojary@ucdconnect.ie}
 \and
 \IEEEauthorblockN{Dharmik Arvind Vara}
 \IEEEauthorblockA{\textit{School of Computer Science, UCD} \\
 Dublin, Ireland \\
-email address @ucdconnect.ie}
+dharmik.vara@ucdconnect.ie}
 \and
 \IEEEauthorblockN{Karthika Garikapati}
 \IEEEauthorblockA{\textit{School of Computer Science, UCD} \\
@@ -153,11 +162,262 @@ By building on HABNet's proven foundation and overcoming it's deployment limitat
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Implementation}
 
+\subsection{Architecture Overview and Evolution}
+The system evolved from an MVP into a robust, scalable microservices platform organized as three decoupled services: a Next.js frontend, a FastAPI-based User Service (gateway), and an internal FastAPI Prediction Service. Decoupling isolates user-facing interactions from heavy model execution, enabling resilience and independent scaling. The logical interaction of these components is shown in Figure~\ref{fig:logical_architecture}.
+
+\begin{figure}[H]
+\centering
+\IfFileExists{Images/logical_architecture.png}{%
+  \includegraphics[width=\columnwidth]{Images/logical_architecture.png}%
+}{%
+  \fbox{\parbox{\columnwidth}{\centering Placeholder for logical\_architecture.png}}%
+}
+\caption{High-level logical system architecture with decoupled services and responsibilities.}
+\label{fig:logical_architecture}
+\end{figure}
+
+\subsection{Backend Infrastructure}
+The platform is deployed on Google Cloud Platform (GCP) to overcome the resource limits encountered during MVP deployment. The final deployment uses Cloud Run for serverless containers, Cloud Build and Artifact Registry for CI/CD, and Firestore for persistence. Figure~\ref{fig:deployment_architecture} summarizes the production topology.
+\begin{figure}[H]
+\centering
+\IfFileExists{production_architecture.png}{%
+  \includegraphics[width=\columnwidth]{production_architecture.png}%
+}{%
+  \fbox{\parbox{\columnwidth}{\centering Placeholder for production\_architecture.png}}%
+}
+\caption{Deployment architecture on GCP with CI/CD and managed services.}
+\label{fig:deployment_architecture}
+\end{figure}
+
+\subsubsection{Platform Selection}
+The MVP used Render, which proved insufficient for data-intensive inference due to CPU and memory constraints. GCP was selected after evaluating AWS, offering predictable pricing and seamless integration across Cloud Build, Artifact Registry, and Cloud Run.
+
+\subsubsection{Compute on Cloud Run}
+Cloud Run provides: (i) automatic scale-to-zero and burst handling; (ii) configurable CPU/RAM per service, allowing the Prediction Service to run with higher resources; and (iii) internal-only ingress for the Prediction Service with API-key authenticated calls from the User Service.
+
+\subsubsection{Backend Framework and Database}
+Both services use FastAPI with native async support, allowing the User Service to orchestrate long-running jobs without blocking. Firestore (serverless NoSQL) stores user profiles, subscription data, and financial-aid requests with low-latency access and zero-ops scaling.
+
+\subsection{Frontend Architecture and User Experience}
+
+\subsubsection{Technology Selection and Rationale}
+
+Initially, Streamlit was considered for rapid prototyping with Python ML workflows. However, Next.js was selected for its server-side rendering capabilities improving SEO and load times, automatic performance optimizations for geospatial applications, and native support for JWT authentication and multi-user scalability required for our tiered subscription model.
+
+\subsubsection{User Interface Design and Functioning}
+
+The interface implements two primary workflows:
+
+\textbf{Geospatial Prediction:} Users interact with a Leaflet.js map component through point-and-click coordinate selection. The system validates location, checks subscription tier, and initiates authenticated prediction requests.
+
+\textbf{Image Upload Analysis:} Users upload images up to 10MB through standard file input with client-side validation for JPEG, PNG, TIFF formats. Images are processed by YOLOv11l for HAB detection without drag-and-drop functionality.
+
+\subsubsection{Architecture Components}
+
+The frontend employs modular React components for map interaction, image upload, results visualization, and subscription management. React Context API handles global state management across authentication and user preferences. The responsive, mobile-first design includes comprehensive error boundaries and user feedback systems.
+
+\subsubsection{User Experience Optimization}
+
+The interface prioritizes simplicity: recreational users obtain safety assessments with minimal technical knowledge, while researchers access comprehensive prediction metadata. Loading states provide feedback during model inference, and color-coded risk visualization (green/red) enables immediate HAB prediction interpretation.
+
+This architecture bridges complex spatiotemporal ML capabilities with accessible environmental monitoring for both technical and non-technical users.
+
+\subsection{Data Flow and Service Integration}
+
+The HAB Detection System employs a microservices architecture that efficiently orchestrates prediction requests with security and scalability. A typical prediction request follows the flow as below:
+
+\begin{enumerate}
+\item A logged-in user initiates prediction via map coordinate selection or image upload
+\item The frontend sends an HTTPS request with a JWT token to the User Service
+\item The User Service validates authentication and checks subscription tier via Firestore
+\item Requests are forwarded internally to the Prediction Service with API-key authentication, selecting the appropriate model based on user tier
+\item The Prediction Service executes the corresponding model (XGBoost, CNN-LSTM, CNN-BiLSTM-Attention, or YOLOv11l) and compiles results
+\item Results propagate back through the User Service to the frontend
+\item The frontend renders predictions through maps or image annotations
+\end{enumerate}
+
+Security is maintained through multi-layer validation: client-side input checks, JWT authentication, API-key protected service calls, and tier-based authorization. Asynchronous processing in the User Service prevents blocking during compute-intensive model inference, while Cloud Run provides automatic scaling with ephemeral containers.
+
+This architecture decouples user interactions from heavy computation, enabling secure, scalable, and responsive HAB prediction delivery across the tiered service model.
+
+\subsection{Machine Learning Pipeline and Tiered Execution}
+The Prediction Service operationalizes spatiotemporal ML: it sources satellite data (e.g., chlorophyll-a, SST, RRS), preprocesses modalities into a spatiotemporal datacube for a target area and time window, and dynamically selects the model based on the user's tier: a lightweight XGBoost baseline (Free Tier), a CNN--LSTM model (Tier~2), and a CNN--BiLSTM with attention (Tier~3). For image uploads, a YOLO model performs object detection.
+Preprocessing aligns modalities, handles missing values, and constructs tensors representing 100\,km$^2$ areas over 5--10 days. The end-to-end pipeline runs on-demand within ephemeral Cloud Run instances.
+
+\subsection{Tier 1 (Free Tier): XGBoost Baseline}
+\subsubsection{Data Representation and Training}
+Each sample is a 5-day sequence of $64\times64$ images with 3 channels (61{,}440 features after flattening). Class imbalance is handled with a positive-class weight derived from class ratios. XGBoost uses a binary logistic objective and log-loss evaluation; parallel CPU training finishes in seconds.
+
+\subsubsection{Performance and Efficiency}
+Validation accuracy reaches 0.84 with strong HAB precision (0.90). On a balanced test set (300 samples), accuracy is 0.69 with macro F1 of 0.69; confusion matrix analysis shows TPR 0.71 and TNR 0.67. Efficiency characteristics include training time $<\!5$\,s on CPU, memory $<\!1$\,GB, and $<\!10$\,MB model size. Inference latency is $<\!1$\,ms per sample with $>\!1000$ samples/s throughput (CPU-only). These benchmarks motivate deeper architectures targeting $>\!0.75$ accuracy and reduced generalization gap.
+
+\subsection{Tier 2: CNN--LSTM Spatio-Temporal Model}
+
+\subsubsection{Rationale and Design}
+
+Tier~2 preserves spatial adjacency and temporal dynamics by applying shared convolutional blocks to each day in the 10-day sequence using TimeDistributed Conv2D layers. These convolutional layers extract spatial features from daily satellite images while maintaining spatial relationships. The extracted features are then spatially pooled and flattened before being passed sequentially to an LSTM layer that captures temporal dependencies over the 10-day period.
+
+This design addresses the limitations of Tier~1, which flattens data prematurely losing spatial structure, and enables the model to learn patterns of bloom formation, intensity gradients, and temporal persistence critical for effective HAB detection.
+
+\subsubsection{Model Architecture}
+
+The architecture processes input tensors of shape $(10,64,64,3)$ representing 10 days of $64 \times 64$ pixel satellite images with 3 spectral channels. The model consists of:
+
+\begin{itemize}
+\item \textbf{Spatial Feature Extraction:} Two TimeDistributed Conv2D blocks (32 and 64 filters) with $3 \times 3$ kernels apply the same convolutional operations to each daily image, preserving temporal independence while learning spatial patterns
+\item \textbf{Normalization and Pooling:} BatchNormalization layers stabilize training, while $2 \times 2$ MaxPooling reduces spatial dimensions and computational complexity
+\item \textbf{Temporal Modeling:} A 128-unit LSTM processes the flattened spatial features sequentially, learning temporal dependencies and bloom evolution patterns
+\item \textbf{Classification Head:} Dense layers with ReLU activation and 40\% dropout prevent overfitting before final softmax classification
+\end{itemize}
+
+\subsubsection{Architecture Diagram}
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[
+    node distance=0.3cm,
+    layer/.style={rectangle, draw=black, fill=blue!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize},
+    input/.style={rectangle, draw=black, fill=green!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize},
+    output/.style={rectangle, draw=black, fill=red!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize}
+]
+\node[input] (input) {Input: $(10,64,64,3)$};
+\node[layer, below=of input] (conv1) {TimeDistributed Conv2D (32, $3\times3$)};
+\node[layer, below=of conv1] (bn1) {TimeDistributed BatchNorm};
+\node[layer, below=of bn1] (pool1) {TimeDistributed MaxPool2D ($2\times2$)};
+\node[layer, below=of pool1] (conv2) {TimeDistributed Conv2D (64, $3\times3$)};
+\node[layer, below=of conv2] (bn2) {TimeDistributed BatchNorm};
+\node[layer, below=of bn2] (pool2) {TimeDistributed MaxPool2D ($2\times2$)};
+\node[layer, below=of pool2] (flatten) {TimeDistributed Flatten};
+\node[layer, below=of flatten] (lstm) {LSTM (128 units)};
+\node[layer, below=of lstm] (dropout1) {Dropout (0.4)};
+\node[layer, below=of dropout1] (dense1) {Dense (64, ReLU)};
+\node[output, below=of dense1] (output) {Dense (2, Softmax)};
+\draw[->, thick] (input) -- (conv1);
+\draw[->, thick] (conv1) -- (bn1);
+\draw[->, thick] (bn1) -- (pool1);
+\draw[->, thick] (pool1) -- (conv2);
+\draw[->, thick] (conv2) -- (bn2);
+\draw[->, thick] (bn2) -- (pool2);
+\draw[->, thick] (pool2) -- (flatten);
+\draw[->, thick] (flatten) -- (lstm);
+\draw[->, thick] (lstm) -- (dropout1);
+\draw[->, thick] (dropout1) -- (dense1);
+\draw[->, thick] (dense1) -- (output);
+\end{tikzpicture}
+\caption{Tier~2 CNN--LSTM spatio-temporal model.}
+\label{fig:tier2_architecture}
+\end{figure}
+
+\subsubsection{Training and Results}
+
+Training uses Adam optimizer ($\alpha=0.001$), batch size 16, and 30 epochs on dual Tesla~T4 GPUs. Validation accuracy reached 0.84 on 58 samples, with test accuracy of 0.73 on a balanced 400-sample test set, demonstrating improved generalization over Tier~1. Limitations include unidirectional temporal processing, uniform temporal weighting, and reduced interpretability, motivating Tier~3 development.
+
+\subsection{Tier 3: CNN--BiLSTM--Attention Advanced Model}
+
+\subsubsection{Enhancements and Design}
+
+Tier~3 improves upon Tier~2 by replacing the LSTM with a bidirectional LSTM (BiLSTM) to capture both forward and backward temporal dependencies, enhancing the model's ability to learn complex temporal patterns in HAB formation. Additionally, a custom attention mechanism is incorporated to learn the relative importance of each timestep in the 10-day sequence, allowing the model to focus on critical days that most influence bloom prediction.
+
+\subsubsection{Model Architecture}
+
+The model processes the same input shape $(10,64,64,3)$ with initial convolutional feature extraction consistent with Tier~2, but incorporates advanced temporal modeling components:
+
+\begin{itemize}
+\item \textbf{Spatial Feature Extraction:} TimeDistributed Conv2D layer (32 filters, $3 \times 3$ kernels) with MaxPooling for efficient spatial pattern recognition across all timesteps
+\item \textbf{BiLSTM Layer:} A 128-unit bidirectional LSTM with \texttt{return\_sequences} enabled processes temporal features in both forward and backward directions, capturing dependencies that unidirectional LSTMs miss
+\item \textbf{Attention Mechanism:} Computes attention weights for each timestep, learning to focus on the most informative days in the sequence and aggregating weighted features into a context vector
+\item \textbf{Classification Head:} Dense layer with 128 units and ReLU activation, followed by 50\% dropout for regularization, before final softmax classification
+\end{itemize}
+
+The attention mechanism enables model interpretability by revealing which days contribute most to HAB predictions, crucial for environmental monitoring applications requiring transparent decision-making.
+
+\subsubsection{Architecture Diagram}
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[
+    node distance=0.3cm,
+    layer/.style={rectangle, draw=black, fill=blue!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize},
+    input/.style={rectangle, draw=black, fill=green!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize},
+    output/.style={rectangle, draw=black, fill=red!15, minimum width=3cm, minimum height=0.5cm, align=center, font=\footnotesize}
+]
+\node[input] (input) {Input: $(10,64,64,3)$};
+\node[layer, below=of input] (conv1) {TimeDistributed Conv2D (32, $3\times3$)};
+\node[layer, below=of conv1] (pool1) {TimeDistributed MaxPool2D ($2\times2$)};
+\node[layer, below=of pool1] (flatten) {TimeDistributed Flatten};
+\node[layer, below=of flatten] (bilstm) {BiLSTM (128 units, return\_sequences)};
+\node[layer, below=of bilstm] (attention) {Attention Layer};
+\node[layer, below=of attention] (dense1) {Dense (128, ReLU)};
+\node[layer, below=of dense1] (dropout) {Dropout (0.5)};
+\node[output, below=of dropout] (output) {Dense (2, Softmax)};
+\draw[->, thick] (input) -- (conv1);
+\draw[->, thick] (conv1) -- (pool1);
+\draw[->, thick] (pool1) -- (flatten);
+\draw[->, thick] (flatten) -- (bilstm);
+\draw[->, thick] (bilstm) -- (attention);
+\draw[->, thick] (attention) -- (dense1);
+\draw[->, thick] (dense1) -- (dropout);
+\draw[->, thick] (dropout) -- (output);
+\end{tikzpicture}
+\caption{Tier~3 CNN--BiLSTM with attention.}
+\label{fig:tier3_architecture}
+\end{figure}
+
+\subsubsection{Training and Results}
+
+Training used Adam optimizer with learning rate $10^{-4}$, batch size 16, early stopping (patience 5), and 50\% dropout on dual Tesla~T4 GPUs, completing in approximately 53 seconds. Validation accuracy reached 0.84 on 90 samples. On a balanced 400-sample test set, accuracy was 0.81 with macro F1 score of 0.81. The confusion matrix shows balanced performance:
+
+\begin{equation}
+\begin{bmatrix}
+162 & 38\\
+38 & 162
+\end{bmatrix}
+\end{equation}
+
+Additional metrics include AUC $\approx$ 0.89, MCC 0.62, and a reduced generalization gap of 3\% compared to previous tiers. The model comprises approximately 32M trainable parameters, predominantly in the BiLSTM layer, achieving the best performance-interpretability balance in our tiered architecture.
+
+\subsection{Image-Based Detection: YOLO Object Detection}
+
+\subsubsection{Rationale and Architecture}
+
+YOLOv11-large, implemented with the Ultralytics framework, enables precise detection and localization of HAB regions in uploaded images, providing bounding boxes with confidence scores essential for environmental monitoring applications.
+
+\subsubsection{Training Configuration}
+
+The model was trained for 30 epochs using input images resized to $640 \times 640$ pixels with batch size 16. Training utilized the standard YOLO loss function combining classification, localization, and objectness components.
+
+\subsubsection{Model Architecture}
+
+The YOLOv11l architecture employs a three-component design:
+\begin{itemize}
+\item \textbf{Backbone:} CSP (Cross Stage Partial) network for efficient feature extraction
+\item \textbf{Neck:} Path Aggregation Network (PANet) for multi-scale feature fusion
+\item \textbf{Head:} Decoupled classification and regression heads with anchor-free detection
+\end{itemize}
+
+Multi-scale predictions with SiLU activation functions enable detection of HAB regions across varying spatial scales while maintaining real-time inference capabilities.
+
+\subsubsection{Detection Pipeline}
+
+For input images $I \in \mathbb{R}^{H \times W \times 3}$, the model outputs bounding boxes $B_i$, confidence scores $c_i$, and class probabilities $p_i$. Detections are filtered by confidence threshold $\theta$ and refined using non-maximum suppression with IoU threshold 0.45 to eliminate overlapping predictions.
+
+\subsubsection{Performance Results}
+
+Validation metrics achieved 84.7\% precision, 43.7\% recall, 48.9\% mAP@0.5, 29.5\% mAP@0.5--0.95, and fitness score of 0.315, indicating high confidence in predicted detections with moderate coverage of true HAB regions.
+
+\subsubsection{Integration and Service}
+
+The YOLOv11l model serves premium tiers for image-based predictions, processing uploaded images through automatic preprocessing, object detection, and visualization of detected HAB regions with confidence scores and spatial localization.
 
 
-\newpage
-temp
-\newpage
+\subsection{Key Technical Contributions (Implementation Highlights)}
+\begin{itemize}
+\item \textbf{Serverless operationalization of ML:} Production-grade, on-demand spatiotemporal inference in a fully managed, scalable architecture.
+\item \textbf{Asynchronous gateway:} Non-blocking orchestration in the User Service to keep the UI responsive during long-running jobs.
+\item \textbf{Dynamic, tiered model serving:} Routing based on subscription tier across classical ML, deep spatio-temporal, and attention-enhanced models; YOLO for image uploads.
+\item \textbf{End-to-end CI/CD automation:} GitHub $\to$ Cloud Build $\to$ Cloud Run for consistent, low-risk deployments.
+\end{itemize}
+
 
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Evaluation and Results}
@@ -209,9 +469,16 @@ In summary, the stress tests confirmed that our decoupled, serverless architectu
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Summary of Achievements}
-Our HAB Detection System successfully achieves the transformation from reactive harmful algal bloom management to a proactive approach by using satellite data and machine learning. The system achieves its core objective of providing HAB predictions for 10 days ahead with a 92\% accuracy, achieving a clear improvement over traditional 3 day forecasts with 60\% accuracy. This achievement gives the important 5-7 days needed for an effective response, potentially preventing millions in economic losses and protecting public health.
+Our HAB Detection System successfully achieves the transformation from reactive harmful algal bloom management to a proactive approach that we were aiming for by using satellite data and machine learning. The system achieves its core objective of providing HAB predictions for 10 days ahead with a 92\% accuracy, achieving a clear improvement over traditional 3 day forecasts with 60\% accuracy. This achievement gives the important 5-7 days needed for an effective response, potentially preventing millions in economic losses and protecting public health.
 
 The tiered architecture successfully, serves diverse users needs from recreational water users to research institutions, balancing efficiency with prediction accuracy based on their needs. Our Free Tier gives accessible predictions for general public use, while premium tiers providing research grade accuracy for professional applications. Our performance testing confirms system scalability with demonstrating production readiness.
+
+\subsection{System Limitations and Quality Assessment}
+While achieving our core objectives, our evaluation revealed some limitations requiring acknowledgment. The 75.8-second response times and cold start delays impact user experience, while binary prediction outputs limit nuanced decision-making compared to confidence intervals that some users requested. YOLO detection remains challenged by false positives, particularly distinguishing algae from vegetation. Despite these limitations, comprehensive stress testing validates system scalability with 100\% success rates under 50 concurrent users, demonstrating production readiness.
+
+\subsection{Future Work and Extensions}
+Future enhancements should address technical limitations through improved caching strategies, enhanced prediction granularity with confidence intervals, and expanded YOLO training datasets. System security improvements including token-based authentication and comprehensive monitoring would strengthen production deployment. Methodologically, evaluation expansion to include long-term user studies and comparative analysis with operational systems like NOAA's HAB-OFS would validate broader applicability. Integration with newer satellite sensors and extension to global geographic regions represent longer-term development opportunities.
+
 
 \newpage
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,10 +496,6 @@ pp. 3229–3239.
 \bibitem{b7} Y. LeCun, Y. Bengio, and G. Hinton, "Deep learning," Nature, vol. 521, no. 7553, pp. 436–444, 2015.
 
 \bibitem{b8} S. Hochreiter and J. Schmidhuber, "Long short-term memory," Neural computation, vol. 9, no. 8, pp. 1735–1780, 1997.
-
-
-
-
 
 
 \bibitem{b10} "Harmful Algal BloomS Observing System," https://habsos.noaa.gov/.
