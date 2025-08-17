@@ -1,28 +1,32 @@
 # Harmful Algal Bloom (HAB) Prediction API
 
-This repository contains the backend microservice for Harmful Algal Bloom (HAB) detection. It is a high-performance API built with FastAPI, designed to perform computationally intensive geospatial data processing and machine learning inference.
+**Live Application**: [https://hab-frontend-995234883383.us-central1.run.app/](https://hab-frontend-995234883383.us-central1.run.app/)
 
-This service functions as a secure, internal engine that is called by user-facing backend. It does not handle user management or authentication itself, but rather relies on a trusted upstream service.
+---
 
-## Core Features
+This repository contains the backend microservice for a Harmful Algal Bloom (HAB) detection and prediction system. It is a high-performance API built with FastAPI, designed to perform computationally intensive geospatial data processing and machine learning inference.
+
+This service functions as a secure, internal engine that is called by other services (like a user-facing backend). It does not handle user management or authentication itself, but rather relies on a trusted upstream service.
+
+## 📌 Core Features
 
 *   **Tiered Toxicity Forecasting**: Predicts the probability of a HAB event being "toxic" or "non-toxic" based on geographic location and date. It uses different models and data sources based on a requested tier (`free`, `tier1`, `tier2`).
-*   **Satellite Data Integration**: Connects directly to NASA's Earthdata archives to download and process MODIS satellite data.
+*   **Satellite Data Integration**: Connects directly to NASA's Earthdata archives to download and process MODIS satellite data in near real-time.
 *   **Advanced Geospatial Processing**: Transforms raw, scattered satellite data points into structured, multi-dimensional "datacubes" for analysis.
 *   **Multi-Model Inference**: Supports various machine learning models, including Scikit-learn, TensorFlow/Keras (with custom attention layers), and PyTorch.
-*   **Image-Based Algae Detection**: Provides an endpoint to analyze a user-uploaded image and identify the presence of algae using a YOLO object detection model.
+*   **Image-Based Algae Detection**: Provides an endpoint to analyze a user-uploaded image and identify the presence of algae using a YOLOv8 object detection model.
 *   **Asynchronous & Scalable**: Built on an async framework and designed to handle high concurrency, making it suitable for serverless deployments like Google Cloud Run.
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 *   **Framework**: FastAPI
 *   **Web Server**: Uvicorn
-*   **Machine Learning**: TensorFlow, Scikit-learn, PyTorch (Ultralytics YOLO)
+*   **Machine Learning**: TensorFlow, Scikit-learn, PyTorch (Ultralytics YOLOv8)
 *   **Geospatial/Scientific**: `earthaccess`, `netCDF4`, `pyproj`, `scipy`, `numpy`
 *   **Image Processing**: OpenCV, Pillow
 *   **Containerization**: Docker
 
-## Setup and Installation
+## ⚙️ Setup and Installation
 
 ### Prerequisites
 
@@ -51,7 +55,7 @@ This service functions as a secure, internal engine that is called by user-facin
     pip install -r requirements.txt
     ```
 
-## Environment Configuration
+## 🔑 Environment Configuration
 
 Create a `.env` file in the `backend` directory by copying the example. This file stores necessary credentials.
 
@@ -71,7 +75,7 @@ INTERNAL_API_KEY=<a_secure_random_string_for_service-to-service_auth>
 *   `EARTHDATA_*`: Credentials for accessing NASA's satellite data archives.
 *   `INTERNAL_API_KEY`: A secret key that the upstream User Service must provide in the `X-API-Key` header to use this API.
 
-## Running the Service
+## 🚀 Running the Service
 
 ### Locally
 
@@ -96,7 +100,7 @@ The API will be available at `http://127.0.0.1:5000`.
     ```
     The API will be available at `http://localhost:8080`.
 
-## API Endpoints
+## 🔌 API Endpoints
 
 All requests must include the `X-API-Key` header with the value of `INTERNAL_API_KEY` from your `.env` file.
 
@@ -152,4 +156,10 @@ All requests must include the `X-API-Key` header with the value of `INTERNAL_API
       "annotated_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQEBAQIBAQECAg..."
     }
     ```
-    *   `annotated_image`: A Base64 encoded string of the input image with bounding boxes drawn on it.
+
+---
+
+### 🧩 Related Repositories
+
+*   **Frontend**: [DV821/hab-frontend](https://github.com/DV821/hab-frontend)
+*   **User Service**: [sagar-rsh/hab-backend](https://github.com/sagar-rsh/hab-backend)
