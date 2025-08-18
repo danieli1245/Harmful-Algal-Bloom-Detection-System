@@ -26,6 +26,14 @@ This service functions as a secure, internal engine that is called by other serv
 *   **Image Processing**: OpenCV, Pillow
 *   **Containerization**: Docker
 
+## 📂 Project Structure
+
+The repository is organized into several key directories:
+
+*   `backend/`: Contains the source code for the FastAPI prediction API, including all logic for handling requests, processing data, and running model inference. This is the code that is containerized and deployed.
+*   `DataPipeline/`: Includes scripts and resources for the complete data engineering workflow. This covers extracting raw satellite data, processing and cleaning it, and preparing the final datasets used to train the machine learning models.
+*   `Notebooks/`: A collection of Jupyter Notebooks detailing the model development process. These notebooks cover data exploration, feature engineering, model training, and evaluation for the different prediction tiers.
+
 ## ⚙️ Setup and Installation
 
 ### Prerequisites
