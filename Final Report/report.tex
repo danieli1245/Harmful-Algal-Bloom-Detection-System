@@ -27,6 +27,7 @@
 \begin{document}
 
 \title{HAB (Harmful Algal Bloom) Detection System\\
+
 {\footnotesize COMP47250 Team Software Project Final Report}
 }
 
@@ -61,6 +62,7 @@ Dublin, Ireland \\
 roshan.palem@ucdconnect.ie}
 }
 
+
 \maketitle
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{abstract}
@@ -86,7 +88,6 @@ Our projects goal is to create a better solution using satellite data and deep l
 The main challenge we faced was translating HABNet's proven research methodology into an operational system that could serve diverse user needs while overcoming practical deployment constraints. While HABNet demonstrated excellent accuracy in controlled research settings, it required significant technical expertise and computational resources that limited its adoption. We adopted their hybrid CNN+LSTM architecture and spatiotemporal datacube approach, which processes 10 days of satellite data across three critical variables: chlorophyll-a levels, sea surface temperature, and remote sensing reflectance. Our focus was on solving the accessibility and scalability challenges that prevented such systems from reaching their intended users.
 
 To make the system flexible and widely usable, we also introduced a tiered prediction structure that balances accuracy with computational cost and user accessibility. Users can choose between a lightweight free version which uses minimal data and more advanced tiers that deliver better accuracy using richer inputs. All of this is wrapped into a simple web interface where users can click on a map and get bloom predictions instantly. The result is a system that combines technical depth with real world accessibility to stay ahead of harmful algal bloom events.
-\newpage
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \section{User Stories and Scenarios}
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ By building on HABNet's proven foundation and overcoming it's deployment limitat
 
 \subsection{Architecture Overview and Evolution}
 
-The system is implemented using a robust, decoupled microservices architecture. This design was chosen to support a full-featured platform with user management and tiered services, overcoming the limitations of our initial Minimum Viable Product (MVP). This approach improves scalability and maintainability by assigning distinct responsibilities to each service, as shown in Figure \ref{fig:logical_architecture}.
+The system is implemented using a robust, decoupled microservices architecture. This design was chosen to support a full-featured platform with user management and tiered services, overcoming the limitations of our initial Minimum Viable Product (MVP). This approach improves scalability and maintainability by assigning distinct responsibilities to each service, as shown in Figure \ref{fig:system_architecture}.
 
 The architecture consists of three core services:
 \begin{enumerate}
@@ -181,6 +182,17 @@ The architecture consists of three core services:
     \item \textbf{User Service Backend:} A FastAPI gateway that manages all user logic, authentication (JWT), and tier enforcement.
     \item \textbf{Prediction Service Backend:} A dedicated FastAPI service for executing ML models, isolated from public traffic.
 \end{enumerate}
+
+\begin{figure}[H]
+\centering
+\IfFileExists{production_architecture.png}{%
+  \includegraphics[width=\columnwidth]{System_architecture.png}%
+}{%
+  \fbox{\parbox{\columnwidth}{\centering Placeholder for system\_architecture.png}}%
+}
+\caption{System architecture illustrating the flow from frontend user interactions to backend services, external data access, and machine learning model inference.}
+\label{fig:system_architecture}
+\end{figure}
 
 This three-service design was a direct response to the limitations of our MVP, whose simple Streamlit frontend could not support the required user authentication and subscription features. Critically, separating the User Service from the Prediction Service was fundamental. A monolithic backend would have coupled user logic with heavy computation, creating a significant performance bottleneck. Our decoupled approach ensures that intensive prediction jobs do not degrade user interface responsiveness, allowing each component to scale independently.
 
@@ -248,14 +260,12 @@ Tier~2 preserves spatial adjacency and temporal dynamics by applying shared conv
 
 This design addresses the limitations of Tier~1, which flattens data prematurely losing spatial structure, and enables the model to learn patterns of bloom formation, intensity gradients, and temporal persistence critical for effective HAB detection.
 
-\begin{figure}[H]
+\begin{figure}[!t]
     \centering
-    \includegraphics[width=0.4\textwidth]{Tier2_Model.png}
+    \includegraphics[width=0.3\textwidth]{Tier2_Model.png}
     \caption{Block diagram of the Tier~2 CNN--LSTM spatio-temporal network architecture.}
     \label{fig:tier2_model_architecture}
 \end{figure}
-
-\newpage 
 
 \subsubsection{Model Architecture}
 The architecture processes input tensors of shape $(10,64,64,3)$ representing 10 days of $64 \times 64$ pixel satellite images with 3 spectral channels. The model consists of:
@@ -285,9 +295,9 @@ The model processes the same input shape $(10,64,64,3)$ with initial convolution
 \item \textbf{Classification Head:} Dense layer with 128 units and ReLU activation, followed by 50\% dropout for regularization, before final softmax classification
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[!t]
     \centering
-    \includegraphics[width=0.35\textwidth]{Tier3_Model.png}
+    \includegraphics[width=0.25\textwidth]{Tier3_Model.png}
     \caption{Block diagram of the Tier~3 CNN--BiLSTM--Attention model architecture.}
     \label{fig:tier3_model_architecture}
 \end{figure}
@@ -308,30 +318,11 @@ Additional metrics include AUC $\approx$ 0.89, MCC 0.62, and a reduced generaliz
 
 \subsection{Image-Based Detection: YOLO Object Detection}
 
-\subsubsection{Rationale and Architecture}
-YOLOv11-large, implemented with the Ultralytics framework, enables precise detection and localization of HAB regions in uploaded images, providing bounding boxes with confidence scores essential for environmental monitoring applications.
+YOLOv11-large, implemented with the Ultralytics framework, accurately detects and localizes HAB regions by generating bounding boxes with confidence scores, supporting critical environmental monitoring applications. The architecture includes a CSP (Cross Stage Partial) backbone for efficient feature extraction, a PANet (Path Aggregation Network) neck for multi-scale fusion, and decoupled anchor-free classification and regression heads. SiLU (Sigmoid Linear Unit) activations enable multi-scale predictions and real-time inference.
 
-\subsubsection{Training Configuration}
-The model was trained for 30 epochs using input images resized to $640 \times 640$ pixels with batch size 16. Training utilized the standard YOLO loss function combining classification, localization, and objectness components.
+The model was trained for 30 epochs on images resized to $640 \times 640$ pixels with batch size 16, using the standard YOLO loss combining classification, localization, and objectness components. Given input images $I \in \mathbb{R}^{H \times W \times 3}$, the model outputs bounding boxes $B_i$, confidence scores $c_i$, and class probabilities $p_i$. Predictions are filtered by a confidence threshold $\theta$ and refined with non-maximum suppression at an IoU threshold of 0.45.
 
-\subsubsection{Model Architecture}
-The YOLOv11-large architecture employs a three-component design:
-
-\begin{itemize}
-    \item \textbf{Backbone:} CSP (Cross Stage Partial) network for efficient feature extraction
-    \item \textbf{Neck:} Path Aggregation Network (PANet) for multi-scale feature fusion
-    \item \textbf{Head:} Decoupled classification and regression heads with anchor-free detection
-\end{itemize}
-Multi-scale predictions with SiLU activation functions enable detection of HAB regions across varying spatial scales while maintaining real-time inference capabilities.
-
-\subsubsection{Detection Pipeline}
-For input images $I \in \mathbb{R}^{H \times W \times 3}$, the model outputs bounding boxes $B_i$, confidence scores $c_i$, and class probabilities $p_i$. Detections are filtered by confidence threshold $\theta$ and refined using non-maximum suppression with IoU threshold 0.45 to eliminate overlapping predictions.
-
-\subsubsection{Performance Results}
-Validation metrics achieved 84.7\% precision, 43.7\% recall, 48.9\% mAP@0.5, 29.5\% mAP@0.5--0.95, and a fitness score of 0.315, indicating high confidence in predicted detections with moderate coverage of true HAB regions.
-
-\subsubsection{Integration and Service}
-The YOLOv11-large model serves premium tiers for image-based predictions, processing uploaded images through automatic preprocessing, object detection, and visualization of detected HAB regions with confidence scores and spatial localization.
+Validation results show 84.7\% precision, 43.7\% recall, 48.9\% mAP@0.5, 29.5\% mAP@0.5--0.95, and a fitness score of 0.315, reflecting high detection confidence with moderate recall. YOLOv11-large powers premium-tier image-based prediction services, automating preprocessing, detection, and visualization of HAB regions with confidence scores and spatial localization.
 
 \subsection{Data Flow and Integration}
 
@@ -350,14 +341,19 @@ The end-to-end data flow for a prediction request is as follows:
 
 For an \textbf{image upload request}, the flow is similar but the payload and model execution differ. The frontend sends the image file to the User Service, which then forwards it to the Prediction Service. The Prediction Service then executes the YOLO model on the image and returns the analysis results.
 
-\subsection{Key Technical Contributions (Implementation Highlights)}
+\subsection{Key Technical Contributions}
+
+The principal technical contributions of this work are founded upon architectural decisions designed to ensure system scalability and reliability:
 
 \begin{itemize}
-\item \textbf{Serverless operationalization of ML:} Production-grade, on-demand spatiotemporal inference in a fully managed, scalable architecture.
-\item \textbf{Asynchronous gateway:} Non-blocking orchestration in the User Service to keep the UI responsive during long-running jobs.
-\item \textbf{Dynamic, tiered model serving:} Routing based on subscription tier across classical ML, deep spatio-temporal, and attention-enhanced models; YOLO for image uploads.
-\item \textbf{End-to-end CI/CD automation:} GitHub $\to$ Cloud Build $\to$ Cloud Run for consistent, low-risk deployments.
+\item \textbf{Serverless Machine Learning Deployment:} Advanced spatiotemporal models were operationalized within a fully serverless environment, converting research prototypes into production-ready, on-demand AI services suitable for data-intensive applications.
+\item \textbf{Asynchronous Task Orchestration:} FastAPI’s asynchronous capabilities were utilized in the User Service Gateway, enabling efficient handling of long-running prediction tasks and maintaining system responsiveness for concurrent users.
+\item \textbf{Dynamic Tiered Model Routing:} The system employs dynamic routing of requests to different machine learning models (e.g., geospatial and YOLO architectures) according to user subscription tier, achieving scalable service differentiation in terms of accuracy and computational resources.
+\item \textbf{End-to-End CI/CD Automation:} A fully automated continuous integration and deployment pipeline was implemented using Google Cloud Build, facilitating rapid, reliable deployments directly from source repositories without manual intervention.
 \end{itemize}
+
+\subsection{Project Repositories}
+The source code supporting this work is publicly available in three GitHub repositories corresponding to the \href{https://github.com/DV821/hab-frontend}{frontend}, \href{https://github.com/sagar-rsh/hab-backend}{user service backend}, and \href{https://github.com/danieli1245/Harmful-Algal-Bloom-Detection-System}{prediction service backend}.
 
 
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -378,7 +374,7 @@ Our 3-tier architecture allows for direct comparison of accuracy/efficiency trad
 
 To demonstrate the effectiveness of our approach, we evaluated our system against traditional HAB detection methods and existing operational systems as shown in Table~\ref{tab:baseline_comparison}.
 
-\begin{table}[H]
+\begin{table}[!t]
 \centering
 \caption{Performance Comparison with Baseline Methods}
 \label{tab:baseline_comparison}
@@ -448,7 +444,6 @@ While achieving our core objectives, our evaluation revealed some limitations re
 \subsection{Future Work and Extensions}
 
 Future enhancements should address technical limitations through improved caching strategies, enhanced prediction granularity with confidence intervals, and expanded YOLO training datasets. System security improvements including token-based authentication and comprehensive monitoring would strengthen production deployment. Methodologically, evaluation expansion to include long-term user studies and comparative analysis with operational systems like NOAA's HAB-OFS would validate broader applicability. Integration with newer satellite sensors and extension to global geographic regions represent longer-term development opportunities. Most critically, integration with real-time decision support systems for environmental agencies represents the next step toward operational deployment, transforming HAB response from reactive crisis management to predictive environmental stewardship.
-
 
 %%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 \begin{thebibliography}{00}
